@@ -1,0 +1,50 @@
+{
+  "name": "lss-root",
+  "private": true,
+  "packageManager": "pnpm@12.10.1+sha512.ba40a37eb1a370d60fea8c4cf1d364c13bcccef518e98ad2bcee954f539d38da37458e58261a3fa55e06523450ea0ffff9f497b135be41f2c15c1642bacace6c",
+  "type": "module",
+  "scripts": {
+    "changeset": "changeset",
+    "version-packages": "changeset version && pnpm install --lockfile-only --no-frozen-lockfile --ignore-scripts",
+    "clean": "pnpm --filter \"./packages/**\" run clean",
+    "preinstall": "node -e \"if(process.env.CI == 'true') {console.log('Skipping preinstall...')} else {process.exit(1)}\" || npx -y only-allow pnpm",
+    "test": "pnpm run test:ci",
+    "test:pr": "pnpm run test:ci",
+    "test:ci": "pnpm run test:eslint && pnpm run test:format && pnpm run test:evals && pnpm run test:types && pnpm run test:lib && pnpm run build",
+    "test:eslint": "eslint eslint.config.js promptfooconfig.js && nx run-many -t test:eslint",
+    "test:format": "pnpm run prettier --check",
+    "test:sherif": "sherif",
+    "test:lib": "nx run-many -t test:lib",
+    "test:build": "pnpm run build",
+    "test:types": "nx run-many -t test:types",
+    "test:knip": "knip",
+    "test:evals": "PROMPTFOO_CONFIG_DIR=.promptfoo promptfoo validate config --config promptfooconfig.js",
+    "eval:skill": "PROMPTFOO_CONFIG_DIR=.promptfoo promptfoo eval --config promptfooconfig.js",
+    "eval:skill:view": "promptfoo view .promptfoo",
+    "build": "nx run-many -t build",
+    "build:all": "pnpm run build",
+    "dev": "pnpm --parallel --filter \"./examples/*\" dev",
+    "prettier": "prettier --ignore-unknown .",
+    "prettier:write": "pnpm run prettier --write",
+    "preview": "pnpm --filter tanstack-router preview"
+  },
+  "nx": {
+    "includedScripts": [
+      "test:knip",
+      "test:sherif"
+    ]
+  },
+  "devDependencies": {
+    "@changesets/cli": "^3.0.3",
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^26.6.4",
+    "eslint": "^10.12.0",
+    "knip": "^6.40.0",
+    "nx": "23.3.0",
+    "prettier": "^3.9.9",
+    "promptfoo": "0.124.1",
+    "sherif": "^1.13.0",
+    "typescript": "^6.0.2",
+    "typescript-eslint": "^8.71.1"
+  }
+}
