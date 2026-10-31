@@ -10,11 +10,14 @@
   },
   "type": "module",
   "dependencies": {
+    "@fastify/websocket": "^11.3.4",
     "@libsql/client": "^0.18.0",
     "drizzle-orm": "1.0.0-rc.5",
-    "fastify": "^5.12.7"
+    "fastify": "^5.12.7",
+    "ws": "^8.22.0"
   },
   "devDependencies": {
+    "@types/ws": "^8.18.2",
     "drizzle-kit": "1.0.0-rc.5"
   }
 }
