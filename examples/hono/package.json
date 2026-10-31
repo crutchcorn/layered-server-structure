@@ -1,0 +1,26 @@
+{
+  "name": "@lss/example-hono",
+  "private": true,
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node --watch --env-file=.env src/index.ts",
+    "start": "node --env-file=.env src/index.ts",
+    "gen:openapi": "node ./scripts/generate-openapi-spec.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "type": "module",
+  "dependencies": {
+    "@hono/node-server": "^2.1.5",
+    "@libsql/client": "^0.18.0",
+    "@scalar/hono-api-reference": "^0.12.17",
+    "@valibot/to-json-schema": "^1.8.0",
+    "drizzle-orm": "1.0.0-rc.5",
+    "hono": "^4.13.14",
+    "hono-openapi": "^1.5.0",
+    "valibot": "^1.5.0"
+  },
+  "devDependencies": {
+    "drizzle-kit": "1.0.0-rc.5"
+  }
+}
