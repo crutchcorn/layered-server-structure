@@ -3,7 +3,7 @@
   "groupings": [
     {
       "title": "Server",
-      "description": "Do a thing",
+      "description": "Organize backend routes, middleware, handlers, and services with clear import boundaries.",
       "skills": ["layered-server-structure"]
     }
   ]

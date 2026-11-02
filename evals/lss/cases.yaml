@@ -1,0 +1,60 @@
+- description: Organizes multi-verb and sub-path endpoints under features/<feature>/routes/<name>/ with descriptive filenames
+  vars:
+    task: |
+      We're refactoring `src/users.ts` in our Hono server into Layered Server Structure. Right now it handles `GET /users`, `POST /users`, and `GET /users/:id` in one file. How should the files and folders under `src/features/users/` be laid out and named?
+  assert:
+    - type: llm-rubric
+      value: |
+        User request:
+        {{task}}
+
+        Pass if the response:
+        - Places an unprefixed `users.route.ts` at `src/features/users/users.route.ts` to mount the sub-routes, without placing verb-prefixed `.route.ts` files directly at the feature root.
+        - Places `/` endpoints inside `src/features/users/routes/index/` with verb-prefixed, descriptive filenames (such as `users.get.route.ts` and `users.post.route.ts`), and explicitly avoids naming them `index.get.route.ts` or `index.post.route.ts`.
+        - Places `/:id` inside a named sub-route folder under `routes/` (such as `src/features/users/routes/by-id/user-by-id.get.route.ts`), rather than putting `by-id/` directly under `src/features/users/` next to layer folders.
+
+- description: Separates middleware, handlers, and framework-independent services
+  vars:
+    task: |
+      Review this Fastify feature layout and tell me where each misplaced module belongs:
+      - `src/features/orders/constants/require-session.ts` reads `request.headers.authorization`, queries `sessionsTable` through `db`, and replies `401` if invalid.
+      - `src/features/orders/handlers/format-problem.ts` imports `db` from `../../../services/db.ts` to look up the order owner before sending a 403 JSON response.
+      - `src/services/orders-db.ts` imports `FastifyReply` from `fastify` and calls `reply.code(500).send(...)` when a query fails.
+  assert:
+    - type: llm-rubric
+      value: |
+        User request:
+        {{task}}
+
+        Pass if the response:
+        - Moves `require-session.ts` out of `constants/` into `middleware/` (`features/orders/middleware/` or `src/middleware/` if shared) because it executes in the request lifecycle and reads `request`/`reply`.
+        - Explains that `handlers/` must stay pure request/response transport without importing `services/` (`db`), so database lookup belongs in the `.route.ts` (or `.logic.ts` / `services/`) while `format-problem.ts` only formats the `reply`.
+        - Removes `fastify` / `FastifyReply` from `src/services/orders-db.ts` so `services/` remains independent of HTTP routing frameworks and returns data or throws domain errors instead of writing HTTP responses.
+
+- description: Prevents cross-feature imports by promoting shared code to src/ layers
+  vars:
+    task: |
+      In our Express API, `src/features/invoices/routes/index/invoices.post.route.ts` imports `requireOrgAdmin` from `../../../teams/middleware/require-org-admin.ts` and `TeamIdSchema` from `../../../teams/utils/schema.ts`. Is this allowed in LSS, and how should we fix it?
+  assert:
+    - type: llm-rubric
+      value: |
+        User request:
+        {{task}}
+
+        Pass if the response:
+        - Identifies importing from `features/teams/` inside `features/invoices/` as a cross-feature boundary violation.
+        - Recommends moving the shared middleware to `src/middleware/` and the shared schema to `src/utils/` (or shared `src/types/` if type-only), widening names/APIs as needed so neither feature imports from a sibling feature.
+
+- description: Keeps .logic.ts free of req/res and recommends boundary integration tests
+  vars:
+    task: |
+      We extracted `src/features/subscriptions/routes/index/subscriptions.post.logic.ts` so we can unit-test proration rules, and it currently accepts `(c: Context)` from Hono so it can read `c.req.header('x- region')` and return `c.json(...)`. We also mocked Drizzle's `db.insert` in our route test. Review both choices using LSS.
+  assert:
+    - type: llm-rubric
+      value: |
+        User request:
+        {{task}}
+
+        Pass if the response:
+        - Advises removing Hono's `Context` (`req`/`res`) from `subscriptions.post.logic.ts` so `.logic.ts` accepts plain inputs and returns plain data (or pure proration calculations move to `utils/`), leaving HTTP header reading and `c.json(...)` to `subscriptions.post.route.ts`.
+        - Recommends testing endpoint behavior through real router requests (`app.request`) against a disposable database rather than mocking ORM methods like `db.insert`, while allowing focused unit tests for tricky standalone proration math.
