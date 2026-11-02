@@ -26,6 +26,7 @@ The consumer supplies its JavaScript/TypeScript parser configuration. Paths are 
 | `lss/logic-imports`        | `src/**/*.logic.{ts,js,mts,cts,mjs,cjs}`               | HTTP/WS router frameworks (`hono`, `fastify`, `express`, `koa`, `h3`, `@nestjs/*`), `middleware`, `handlers`, `routes`, and `.route` modules           |
 | `lss/service-imports`      | `src/**/services/**/*.{ts,tsx,js,jsx,mjs,cjs,mts,cts}` | HTTP/WS router frameworks (`hono`, `fastify`, `express`, `koa`, `h3`, `@nestjs/*`), `middleware`, `handlers`, `routes`, `.route`, and `.logic` modules |
 | `lss/feature-imports`      | `src/**/features/**/*.{ts,tsx,js,jsx,mjs,cjs,mts,cts}` | Imports that resolve into a different `features/<feature>` folder                                                                                      |
+| `lss/encapsulate-features` | `src/**/*.{ts,tsx,js,jsx,mjs,cjs,mts,cts}`             | Shared layers importing `features/`, and callers outside `features/<feature>/` bypassing `<feature>.route` to reach `routes/` or feature internals     |
 | `lss/route-files`          | `src/**/*.route.{ts,tsx,js,jsx,mjs,cjs,mts,cts}`       | `index` route names, verb-prefixed routes outside `routes/<name>/`, unprefixed routes inside `routes/<name>/`, and duplicate verbs in one folder       |
 | `lss/one-logic-per-folder` | `src/**/*.logic.{ts,js,mts,cts,mjs,cjs}`               | `index` logic names, misplaced verb modifiers, more than one unprefixed `.logic` at a feature root, or duplicate verb `.logic` files in one folder     |
 
@@ -35,11 +36,13 @@ The import rules inspect static imports, re-exports, `import()` expressions, uns
 
 Keep in mind that this is a static specifier check, not an import-graph resolver. Computed module names and indirect exports from otherwise permitted barrels aren't traced. Path aliases need to expose their layer segment (for example `@/services/db`); an opaque alias needs an application-specific restriction.
 
-## Keep features independent
+## Keep features independent and encapsulated
 
 `lss/feature-imports` applies to every source file inside a `features/<feature>` folder—including `.route` and `.logic` files, sub-routes under `routes/<name>/`, and feature-scoped `middleware/`, `handlers/`, `services/`, and `utils/`. It reports any import whose module path resolves into a sibling feature folder, such as `../messages/utils/schema` from `src/features/users/users.route.ts`. Imports within the same feature (including from `routes/by-id/` up to `../../utils/schema`) and imports from shared `src/` layers are allowed.
 
-When two features share middleware, a response handler, a service, or a schema, move it to the matching `src/`-level layer and make its interface generic enough for both consumers.
+`lss/encapsulate-features` protects feature boundaries from the outside: shared layers (`middleware/`, `handlers/`, `services/`, `schema/`, `utils/`, `constants/`, and `types/`) may never import from `features/`, and server entry points such as `src/app.ts` must mount a feature through its root `<feature>.route` module (or `index` barrel) rather than reaching directly into `features/<feature>/routes/<name>/` or internal helpers.
+
+When two features—or a shared layer and a feature—need the same middleware, response handler, service, or schema, move it to the matching `src/`-level layer and make its interface generic enough for every consumer.
 
 ## Route and logic file rules
 

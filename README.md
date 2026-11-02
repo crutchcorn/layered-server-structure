@@ -52,7 +52,7 @@ If you already have an ESLint configuration, keep its parser and rules and appen
 npx eslint src
 ```
 
-The recommended configuration checks handler imports in `src/**/handlers/`, logic imports in `src/**/*.logic.*`, service imports under `src/**/services/`, and cross-feature imports under `src/**/features/`. It also enforces descriptive `.route` and `.logic` filenames—allowing one unprefixed `<feature>.route.ts` at `features/<feature>/` and one verb-prefixed `<resource>.<verb>.route.ts` per verb inside `features/<feature>/routes/<name>/` (using `routes/index/` for `/`). For full TypeScript folder and filename enforcement, use `createLssConfig({ root: import.meta.dirname })` as described in the [plugin documentation](packages/eslint/README.md#optional-application-structure).
+The recommended configuration checks handler imports in `src/**/handlers/`, logic imports in `src/**/*.logic.*`, service imports under `src/**/services/`, cross-feature imports under `src/**/features/`, and feature encapsulation across `src/**/` (blocking shared layers from importing `features/` and requiring external callers like `src/app.ts` to mount `<feature>.route.ts` instead of reaching into `routes/`). It also enforces descriptive `.route` and `.logic` filenames—allowing one unprefixed `<feature>.route.ts` at `features/<feature>/` and one verb-prefixed `<resource>.<verb>.route.ts` per verb inside `features/<feature>/routes/<name>/` (using `routes/index/` for `/`). For full TypeScript folder and filename enforcement, use `createLssConfig({ root: import.meta.dirname })` as described in the [plugin documentation](packages/eslint/README.md#optional-application-structure).
 
 ## Repository layout
 
