@@ -218,6 +218,89 @@ function invalidIn(
   return { ...invalid(code, source), filename }
 }
 
+tester.run('pure-imports', plugin.rules['pure-imports'], {
+  valid: [
+    {
+      filename: 'src/utils/email.ts',
+      code: "import * as v from 'valibot'; import type { User } from '../types/user'; import { MAX_LENGTH } from '../constants/limits';",
+    },
+    {
+      filename: 'src/schema/index.ts',
+      code: "import { int, sqliteTable, text } from 'drizzle-orm/sqlite-core';",
+    },
+    {
+      filename: 'src/constants/open-api.ts',
+      code: "import type { GenerateSpecOptions } from 'hono-openapi'; export const openApiSpec: GenerateSpecOptions = {};",
+    },
+    {
+      filename: 'src/types/http.ts',
+      code: "import type { Context } from 'hono'; export type { FastifyReply } from 'fastify'; type Req = import('express').Request;",
+    },
+    {
+      filename: 'C:\\project\\src\\constants\\open-api.ts',
+      code: "import type { GenerateSpecOptions } from 'hono-openapi';",
+    },
+  ],
+  invalid: [
+    invalidIn(
+      'src/utils/email.ts',
+      "import { db } from '../services/db';",
+      '../services/db',
+    ),
+    invalidIn(
+      'src/utils/email.ts',
+      "import type { Context } from 'hono';",
+      'hono',
+    ),
+    invalidIn(
+      'src/schema/index.ts',
+      "import type { FastifyInstance } from 'fastify';",
+      'fastify',
+    ),
+    invalidIn(
+      'src/constants/describe.ts',
+      "import { describeRoute } from 'hono-openapi';",
+      'hono-openapi',
+    ),
+    invalidIn(
+      'src/constants/describe.ts',
+      "import { type GenerateSpecOptions, describeRoute } from 'hono-openapi';",
+      'hono-openapi',
+    ),
+    invalidIn(
+      'src/types/user.ts',
+      "import type { DbClient } from '../services/db';",
+      '../services/db',
+    ),
+    invalidIn(
+      'src/types/user.ts',
+      "import type { AuthContext } from '../middleware/auth';",
+      '../middleware/auth',
+    ),
+    invalidIn(
+      'src/utils/response.ts',
+      "import { sendProblem } from '../handlers/send-problem';",
+      '../handlers/send-problem',
+    ),
+    invalidIn(
+      'src/constants/routes.ts',
+      "import { usersGet } from '../features/users/routes/index/users.get.route';",
+      '../features/users/routes/index/users.get.route',
+    ),
+    invalidIn(
+      'src/utils/user.ts',
+      "import { usersRoute } from '../features/users/users.route';",
+      '../features/users/users.route',
+    ),
+    invalidIn(
+      'src/utils/user.ts',
+      "import { createUser } from '../features/users/users.logic';",
+      '../features/users/users.logic',
+    ),
+    invalid("import { Hono } from 'hono';", 'hono'),
+  ],
+})
+
 tester.run('feature-imports', plugin.rules['feature-imports'], {
   valid: [
     {

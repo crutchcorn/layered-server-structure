@@ -30,15 +30,25 @@ function isUnshadowedRequire(
   return true
 }
 
+interface ModuleSourceMeta {
+  isTypeOnly: boolean
+}
+
 /** Visit statically known module references without resolving application aliases. */
 export function visitModuleSources(
   context: ImportRuleContext,
-  isForbidden: (source: string) => boolean,
+  isForbidden: (source: string, meta: ModuleSourceMeta) => boolean,
 ): TSESLint.RuleListener {
-  function check(node: TSESTree.Node | null | undefined): void {
+  function check(
+    node: TSESTree.Node | null | undefined,
+    isTypeOnly = false,
+  ): void {
     if (!node) return
     const source = staticSource(node)
-    if (source !== undefined && isForbidden(normalizeModuleSource(source))) {
+    if (
+      source !== undefined &&
+      isForbidden(normalizeModuleSource(source), { isTypeOnly })
+    ) {
       context.report({
         node,
         messageId: 'forbiddenImport',
@@ -48,12 +58,19 @@ export function visitModuleSources(
   }
 
   return {
-    ImportDeclaration: (node) => check(node.source),
-    ExportNamedDeclaration: (node) => check(node.source),
-    ExportAllDeclaration: (node) => check(node.source),
+    ImportDeclaration: (node) => check(node.source, node.importKind === 'type'),
+    ExportNamedDeclaration: (node) =>
+      check(node.source, node.exportKind === 'type'),
+    ExportAllDeclaration: (node) =>
+      check(node.source, node.exportKind === 'type'),
     ImportExpression: (node) => check(node.source),
-    TSImportType: (node) => check(node.source ?? node.argument),
-    TSExternalModuleReference: (node) => check(node.expression),
+    TSImportType: (node) => check(node.source ?? node.argument, true),
+    TSExternalModuleReference: (node) =>
+      check(
+        node.expression,
+        node.parent.type === 'TSImportEqualsDeclaration' &&
+          node.parent.importKind === 'type',
+      ),
     CallExpression(node) {
       if (
         node.callee.type === 'Identifier' &&
