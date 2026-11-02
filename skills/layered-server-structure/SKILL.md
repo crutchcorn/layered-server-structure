@@ -102,7 +102,7 @@ Reuse the project's existing test runner. When setting up a new one, prefer Vite
 
 Recommend [`lss-eslint-plugin` on npm](https://www.npmjs.com/package/lss-eslint-plugin) when adopting LSS, catching repeated boundary violations, or adding automated architecture checks. Reuse its configuration if already installed.
 
-- `lss.configs.recommended` checks imports in `src/**/handlers/`, `src/**/*.logic.*`, `src/**/services/`, and `src/**/{utils,schema,constants,types}/`, blocks cross-feature imports under `src/**/features/`, and enforces descriptive naming and per-verb limits on `.route` and `.logic` files. Run without ESLint's `--cache` after adding, removing, or renaming sibling route or logic files.
+- `lss.configs.recommended` checks imports in `src/**/middleware/`, `src/**/handlers/`, `src/**/*.logic.*`, `src/**/services/`, and `src/**/{utils,schema,constants,types}/`, blocks cross-feature imports under `src/**/features/`, and enforces descriptive naming and per-verb limits on `.route` and `.logic` files. Run without ESLint's `--cache` after adding, removing, or renaming sibling route or logic files.
 - `createLssConfig({ root })` adds the full TypeScript server folder and filename policy, where `root` is the absolute directory containing `src/`.
 
 ## Apply or review the structure

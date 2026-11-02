@@ -14,6 +14,7 @@ const options: LssConfigOptions = { root: '/project' }
 const _featureRule: Rule.RuleModule = lss.rules['feature-imports']
 const _handlerRule: Rule.RuleModule = lss.rules['handler-imports']
 const _logicImportsRule: Rule.RuleModule = lss.rules['logic-imports']
+const _middlewareRule: Rule.RuleModule = lss.rules['middleware-imports']
 const _pureRule: Rule.RuleModule = lss.rules['pure-imports']
 const _serviceRule: Rule.RuleModule = lss.rules['service-imports']
 const _routeRule: Rule.RuleModule = lss.rules['route-files']

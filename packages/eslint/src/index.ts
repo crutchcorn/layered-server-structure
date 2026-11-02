@@ -3,6 +3,7 @@ import packageJson from '../package.json' with { type: 'json' }
 import featureImports from './rules/feature-imports.js'
 import handlerImports from './rules/handler-imports.js'
 import logicImports from './rules/logic-imports.js'
+import middlewareImports from './rules/middleware-imports.js'
 import oneLogicPerFolder from './rules/one-logic-per-folder.js'
 import pureImports from './rules/pure-imports.js'
 import routeFiles from './rules/route-files.js'
@@ -17,6 +18,7 @@ export interface LssPlugin extends ESLint.Plugin {
     'feature-imports': Rule.RuleModule
     'handler-imports': Rule.RuleModule
     'logic-imports': Rule.RuleModule
+    'middleware-imports': Rule.RuleModule
     'one-logic-per-folder': Rule.RuleModule
     'pure-imports': Rule.RuleModule
     'route-files': Rule.RuleModule
@@ -40,6 +42,7 @@ const plugin: LssPlugin = {
     'feature-imports': featureImports as unknown as Rule.RuleModule,
     'handler-imports': handlerImports as unknown as Rule.RuleModule,
     'logic-imports': logicImports as unknown as Rule.RuleModule,
+    'middleware-imports': middlewareImports as unknown as Rule.RuleModule,
     'pure-imports': pureImports as unknown as Rule.RuleModule,
     'service-imports': serviceImports as unknown as Rule.RuleModule,
   },
@@ -68,6 +71,12 @@ plugin.configs.recommended = [
     files: ['src/**/*.logic.{ts,js,mts,cts,mjs,cjs}'],
     plugins: { lss: plugin },
     rules: { 'lss/logic-imports': 'error' },
+  },
+  {
+    name: 'lss/middleware-imports',
+    files: [`src/**/middleware/**/*.${codeExtensions}`],
+    plugins: { lss: plugin },
+    rules: { 'lss/middleware-imports': 'error' },
   },
   {
     name: 'lss/one-logic-per-folder',
