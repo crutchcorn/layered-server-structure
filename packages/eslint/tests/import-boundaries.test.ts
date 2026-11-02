@@ -251,6 +251,130 @@ tester.run('feature-imports', plugin.rules['feature-imports'], {
   ],
 })
 
+function encapsulateInvalid(
+  filename: string,
+  code: string,
+  messageId: 'sharedLayerImport' | 'internalFeatureImport',
+  source: string,
+): RuleTester.InvalidTestCase {
+  return {
+    filename,
+    code,
+    errors: [{ messageId, data: { source } }],
+  }
+}
+
+tester.run('encapsulate-features', plugin.rules['encapsulate-features'], {
+  valid: [
+    {
+      filename: 'src/app.ts',
+      code: "import { usersRoute } from './features/users/users.route'; import { messagesRoute } from './features/messages/messages.route.ts';",
+    },
+    {
+      filename: 'src/index.ts',
+      code: "import { users } from './features/users'; import { messages } from './features/messages/index';",
+    },
+    {
+      filename: usersRoute,
+      code: "import { usersGet } from './routes/index/users.get.route'; import { userByIdGet } from './routes/by-id/user-by-id.get.route'; import { UserSchema } from './utils/schema';",
+    },
+    {
+      filename: 'src/features/users/routes/by-id/user-by-id.get.route.ts',
+      code: "import { UserSchema } from '../../utils/schema'; import { db } from '../../../../services/db';",
+    },
+    {
+      filename: 'src/features/users/middleware/check-user.ts',
+      code: "import { UserSchema } from '../utils/schema'; import { requestTiming } from '../../../middleware/request-timing';",
+    },
+    {
+      filename: usersRoute,
+      code: "import { profileRoute } from './features/profile/profile.route';",
+    },
+    {
+      filename: 'src/features/users/features/profile/profile.route.ts',
+      code: "import { UserSchema } from '../../utils/schema';",
+    },
+    {
+      filename: 'C:\\project\\src\\app.ts',
+      code: String.raw`import { usersRoute } from '.\\features\\users\\users.route';`,
+    },
+  ],
+  invalid: [
+    encapsulateInvalid(
+      'src/app.ts',
+      "import { usersGet } from './features/users/routes/index/users.get.route';",
+      'internalFeatureImport',
+      './features/users/routes/index/users.get.route',
+    ),
+    encapsulateInvalid(
+      'src/app.ts',
+      "import { userByIdGet } from './features/users/routes/by-id/user-by-id.get.route.ts';",
+      'internalFeatureImport',
+      './features/users/routes/by-id/user-by-id.get.route.ts',
+    ),
+    encapsulateInvalid(
+      'src/app.ts',
+      "import { usersGet } from '@/features/users/routes/index/users.get.route';",
+      'internalFeatureImport',
+      '@/features/users/routes/index/users.get.route',
+    ),
+    encapsulateInvalid(
+      'src/app.ts',
+      "import { UserSchema } from './features/users/utils/schema';",
+      'internalFeatureImport',
+      './features/users/utils/schema',
+    ),
+    encapsulateInvalid(
+      'src/app.ts',
+      "import { createUser } from './features/users/users.logic';",
+      'internalFeatureImport',
+      './features/users/users.logic',
+    ),
+    encapsulateInvalid(
+      'src/middleware/require-auth.ts',
+      "import { usersRoute } from '../features/users/users.route';",
+      'sharedLayerImport',
+      '../features/users/users.route',
+    ),
+    encapsulateInvalid(
+      'src/handlers/send-problem.ts',
+      "import type { User } from '../features/users/types/user';",
+      'sharedLayerImport',
+      '../features/users/types/user',
+    ),
+    encapsulateInvalid(
+      'src/services/db.ts',
+      "import { UserSchema } from '@/features/users/utils/schema';",
+      'sharedLayerImport',
+      '@/features/users/utils/schema',
+    ),
+    encapsulateInvalid(
+      'src/utils/format.ts',
+      "import { features } from '../features';",
+      'sharedLayerImport',
+      '../features',
+    ),
+    encapsulateInvalid(
+      'src/features/users/utils/helper.ts',
+      "import { profileRoute } from '../features/profile/profile.route';",
+      'sharedLayerImport',
+      '../features/profile/profile.route',
+    ),
+    encapsulateInvalid(
+      usersRoute,
+      "import { avatarPost } from './features/profile/routes/avatar/avatar.post.route';",
+      'internalFeatureImport',
+      './features/profile/routes/avatar/avatar.post.route',
+    ),
+    encapsulateInvalid(
+      'C:\\project\\src\\app.ts',
+      String.raw`import { usersGet } from '.\\features\\users\\routes\\index\\users.get.route';`,
+      'internalFeatureImport',
+      String.raw`.\features\users\routes\index\users.get.route`,
+    ),
+  ],
+})
+
 const baseConfig: Linter.Config = {
   files: ['**/*.{ts,tsx,js,jsx,mjs,cjs,mts,cts}'],
   languageOptions,
