@@ -78,6 +78,49 @@ tester.run('handler-imports', plugin.rules['handler-imports'], {
   ],
 })
 
+tester.run('middleware-imports', plugin.rules['middleware-imports'], {
+  valid: [
+    "import { createMiddleware } from 'hono/factory'; import { db } from '../services/db';",
+    "import { describeRoute, resolver } from 'hono-openapi'; import { UserSchema } from '../../../utils/schema';",
+    "import type { FastifyInstance } from 'fastify'; import { sendProblem } from '../handlers/send-problem';",
+    "import { usersTable } from '../schema/index'; import { verifyToken } from './verify-token';",
+    "import type { Session } from '../types/session'; import { AUTH_HEADER } from '../constants/auth';",
+  ],
+  invalid: [
+    invalid(
+      "import { usersGet } from '../routes/index/users.get.route';",
+      '../routes/index/users.get.route',
+    ),
+    invalid(
+      "import { describeUsers } from '../routes/index/middleware/describe';",
+      '../routes/index/middleware/describe',
+    ),
+    invalid("import { usersRoute } from '../users.route';", '../users.route'),
+    invalid("import { createUser } from '../users.logic';", '../users.logic'),
+    invalid(
+      "import type { UsersRoute } from '../users.route';",
+      '../users.route',
+    ),
+    invalid(
+      "import type { CreateUserInput } from '../users.logic';",
+      '../users.logic',
+    ),
+    invalid(
+      "const route = import('@/features/users/users.route');",
+      '@/features/users/users.route',
+    ),
+    invalid("const logic = require('../users.logic');", '../users.logic'),
+    ...sourceExtensions.flatMap((extension) =>
+      ['route', 'logic'].map((kind) =>
+        invalid(
+          `import mod from '../users.${kind}.${extension}';`,
+          `../users.${kind}.${extension}`,
+        ),
+      ),
+    ),
+  ],
+})
+
 tester.run('logic-imports', plugin.rules['logic-imports'], {
   valid: [
     "import { db } from '../services/db'; import { usersTable } from '../schema/index';",
