@@ -4,6 +4,7 @@ import featureImports from './rules/feature-imports.js'
 import handlerImports from './rules/handler-imports.js'
 import logicImports from './rules/logic-imports.js'
 import oneLogicPerFolder from './rules/one-logic-per-folder.js'
+import pureImports from './rules/pure-imports.js'
 import routeFiles from './rules/route-files.js'
 import serviceImports from './rules/service-imports.js'
 import { createStructureConfig } from './structure.js'
@@ -17,6 +18,7 @@ export interface LssPlugin extends ESLint.Plugin {
     'handler-imports': Rule.RuleModule
     'logic-imports': Rule.RuleModule
     'one-logic-per-folder': Rule.RuleModule
+    'pure-imports': Rule.RuleModule
     'route-files': Rule.RuleModule
     'service-imports': Rule.RuleModule
   }
@@ -38,6 +40,7 @@ const plugin: LssPlugin = {
     'feature-imports': featureImports as unknown as Rule.RuleModule,
     'handler-imports': handlerImports as unknown as Rule.RuleModule,
     'logic-imports': logicImports as unknown as Rule.RuleModule,
+    'pure-imports': pureImports as unknown as Rule.RuleModule,
     'service-imports': serviceImports as unknown as Rule.RuleModule,
   },
   configs: {
@@ -71,6 +74,12 @@ plugin.configs.recommended = [
     files: ['src/**/*.logic.{ts,js,mts,cts,mjs,cjs}'],
     plugins: { lss: plugin },
     rules: { 'lss/one-logic-per-folder': 'error' },
+  },
+  {
+    name: 'lss/pure-imports',
+    files: [`src/**/{utils,schema,constants,types}/**/*.${codeExtensions}`],
+    plugins: { lss: plugin },
+    rules: { 'lss/pure-imports': 'error' },
   },
   {
     name: 'lss/route-files',
