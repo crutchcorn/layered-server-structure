@@ -1,5 +1,6 @@
 import type { ESLint, Linter, Rule } from 'eslint'
 import packageJson from '../package.json' with { type: 'json' }
+import encapsulateFeatures from './rules/encapsulate-features.js'
 import featureImports from './rules/feature-imports.js'
 import handlerImports from './rules/handler-imports.js'
 import logicImports from './rules/logic-imports.js'
@@ -15,6 +16,7 @@ export type LssConfigOptions = StructureConfigOptions
 
 export interface LssPlugin extends ESLint.Plugin {
   rules: {
+    'encapsulate-features': Rule.RuleModule
     'feature-imports': Rule.RuleModule
     'handler-imports': Rule.RuleModule
     'logic-imports': Rule.RuleModule
@@ -39,6 +41,7 @@ const plugin: LssPlugin = {
     'one-logic-per-folder': oneLogicPerFolder,
     'route-files': routeFiles,
     // TypeScript visitors extend ESTree; ESLint's runtime accepts these rules.
+    'encapsulate-features': encapsulateFeatures as unknown as Rule.RuleModule,
     'feature-imports': featureImports as unknown as Rule.RuleModule,
     'handler-imports': handlerImports as unknown as Rule.RuleModule,
     'logic-imports': logicImports as unknown as Rule.RuleModule,
@@ -54,6 +57,12 @@ const plugin: LssPlugin = {
 const codeExtensions = '{ts,tsx,js,jsx,mjs,cjs,mts,cts}'
 
 plugin.configs.recommended = [
+  {
+    name: 'lss/encapsulate-features',
+    files: [`src/**/*.${codeExtensions}`],
+    plugins: { lss: plugin },
+    rules: { 'lss/encapsulate-features': 'error' },
+  },
   {
     name: 'lss/feature-imports',
     files: [`src/**/features/**/*.${codeExtensions}`],

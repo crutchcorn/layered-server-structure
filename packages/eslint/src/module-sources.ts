@@ -1,7 +1,5 @@
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils'
 
-type ImportRuleContext = TSESLint.RuleContext<'forbiddenImport', []>
-
 function staticSource(
   node: TSESTree.Node | null | undefined,
 ): string | undefined {
@@ -17,8 +15,8 @@ function staticSource(
   return undefined
 }
 
-function isUnshadowedRequire(
-  context: ImportRuleContext,
+function isUnshadowedRequire<MessageIds extends string>(
+  context: TSESLint.RuleContext<MessageIds, []>,
   node: TSESTree.CallExpression,
 ): boolean {
   let scope: TSESLint.Scope.Scope | null = context.sourceCode.getScope(node)
@@ -35,9 +33,14 @@ interface ModuleSourceMeta {
 }
 
 /** Visit statically known module references without resolving application aliases. */
-export function visitModuleSources(
-  context: ImportRuleContext,
-  isForbidden: (source: string, meta: ModuleSourceMeta) => boolean,
+export function visitModuleSources<
+  MessageIds extends string = 'forbiddenImport',
+>(
+  context: TSESLint.RuleContext<MessageIds, []>,
+  isForbidden: (
+    source: string,
+    meta: ModuleSourceMeta,
+  ) => boolean | MessageIds | undefined,
 ): TSESLint.RuleListener {
   function check(
     node: TSESTree.Node | null | undefined,
@@ -45,13 +48,13 @@ export function visitModuleSources(
   ): void {
     if (!node) return
     const source = staticSource(node)
-    if (
-      source !== undefined &&
-      isForbidden(normalizeModuleSource(source), { isTypeOnly })
-    ) {
+    if (source === undefined) return
+    const verdict = isForbidden(normalizeModuleSource(source), { isTypeOnly })
+    if (verdict) {
       context.report({
         node,
-        messageId: 'forbiddenImport',
+        messageId:
+          verdict === true ? ('forbiddenImport' as MessageIds) : verdict,
         data: { source },
       })
     }

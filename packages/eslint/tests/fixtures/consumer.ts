@@ -11,6 +11,7 @@ const _recommendedIsTyped: IsAny<typeof lss.configs.recommended> = false
 const _plugin: ESLint.Plugin = lss
 const _namedPluginType: LssPlugin = lss
 const options: LssConfigOptions = { root: '/project' }
+const _encapsulateRule: Rule.RuleModule = lss.rules['encapsulate-features']
 const _featureRule: Rule.RuleModule = lss.rules['feature-imports']
 const _handlerRule: Rule.RuleModule = lss.rules['handler-imports']
 const _logicImportsRule: Rule.RuleModule = lss.rules['logic-imports']
