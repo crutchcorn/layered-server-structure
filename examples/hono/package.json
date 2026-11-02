@@ -2,12 +2,13 @@
   "name": "@lss/example-hono",
   "private": true,
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "src/index.ts",
   "scripts": {
     "dev": "node --watch --env-file=.env src/index.ts",
     "start": "node --env-file=.env src/index.ts",
     "gen:openapi": "node ./scripts/generate-openapi-spec.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test:eslint": "eslint .",
+    "test:types": "tsc --noEmit"
   },
   "type": "module",
   "dependencies": {
@@ -21,6 +22,14 @@
     "valibot": "^1.5.0"
   },
   "devDependencies": {
-    "drizzle-kit": "1.0.0-rc.5"
+    "drizzle-kit": "1.0.0-rc.5",
+    "lss-eslint-plugin": "workspace:*"
+  },
+  "nx": {
+    "includedScripts": [
+      "gen:openapi",
+      "test:eslint",
+      "test:types"
+    ]
   }
 }

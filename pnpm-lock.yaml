@@ -224,6 +224,9 @@ importers:
       drizzle-kit:
         specifier: 1.0.0-rc.5
         version: 1.0.0-rc.5(drizzle-orm@1.0.0-rc.5(@libsql/client@0.18.0)(@opentelemetry/api@1.9.1)(pg@8.23.1)(valibot@1.5.0(typescript@6.0.3))(zod@4.6.5))
+      lss-eslint-plugin:
+        specifier: workspace:*
+        version: link:../../packages/eslint
 
   examples/hono:
     dependencies:
@@ -255,6 +258,9 @@ importers:
       drizzle-kit:
         specifier: 1.0.0-rc.5
         version: 1.0.0-rc.5(drizzle-orm@1.0.0-rc.5(@libsql/client@0.18.0)(@opentelemetry/api@1.9.1)(pg@8.23.1)(valibot@1.5.0(typescript@6.0.3))(zod@4.6.5))
+      lss-eslint-plugin:
+        specifier: workspace:*
+        version: link:../../packages/eslint
 
   packages/eslint:
     dependencies:

@@ -1,15 +1,7 @@
-import Fastify from 'fastify'
-import { userGetRoutes } from './features/users/users.get.ts'
-import { messagesWSRoutes } from './features/messages/messages.ws.ts';
+import { buildApp } from './app.ts'
 
-const fastify = Fastify({
-  logger: true
-})
+const fastify = buildApp()
 
-userGetRoutes(fastify);
-messagesWSRoutes(fastify);
-
-// Run the server!
 fastify.listen({ port: 3000 }, function (err, address) {
   if (err) {
     fastify.log.error(err)
