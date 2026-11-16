@@ -6,10 +6,11 @@ import {
   parseRoleFilename,
   ROUTE_VERBS,
 } from '../route-conventions.js'
+import type { CreateOnceRule } from '../create-once-rule.js'
 
 const allowedVerbsList = ROUTE_VERBS.join(', ')
 
-const routeFiles: Rule.RuleModule = {
+const routeFiles: CreateOnceRule<Rule.RuleModule> = {
   meta: {
     type: 'problem',
     docs: {
@@ -34,18 +35,21 @@ const routeFiles: Rule.RuleModule = {
         'Only one .{{verb}}.route file is allowed per folder. Found: {{files}}. Give distinct sub-paths their own routes/<name>/ folder.',
     },
   },
-  create(context) {
-    // Skip unnamed/virtual input (for example Linter.verify without filename).
-    if (!context.physicalFilename || context.physicalFilename === '<input>') {
-      return {}
-    }
-    const filename = path.resolve(context.cwd, context.physicalFilename)
-    const basename = path.basename(filename)
-    const parsed = parseRoleFilename(basename, 'route')
-    if (!parsed) return {}
-
+  createOnce(context) {
     return {
       Program(node) {
+        // Skip unnamed/virtual input (for example Linter.verify without filename).
+        if (
+          !context.physicalFilename ||
+          context.physicalFilename === '<input>'
+        ) {
+          return
+        }
+        const filename = path.resolve(context.cwd, context.physicalFilename)
+        const basename = path.basename(filename)
+        const parsed = parseRoleFilename(basename, 'route')
+        if (!parsed) return
+
         if (parsed.kind === 'invalid-verb') {
           context.report({
             node,

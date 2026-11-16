@@ -1,7 +1,10 @@
 import type { TSESLint } from '@typescript-eslint/utils'
 import { isLayer, isModuleKind, visitModuleSources } from '../module-sources.js'
+import type { CreateOnceRule } from '../create-once-rule.js'
 
-const handlerImports: TSESLint.RuleModule<'forbiddenImport', []> = {
+const handlerImports: CreateOnceRule<
+  TSESLint.RuleModule<'forbiddenImport', []>
+> = {
   meta: {
     type: 'problem',
     docs: {
@@ -14,7 +17,7 @@ const handlerImports: TSESLint.RuleModule<'forbiddenImport', []> = {
         'Handlers must not import "{{source}}". Keep reusable request/response transport independent of services, middleware, routes, and logic modules; compose those in a .route file.',
     },
   },
-  create(context) {
+  createOnce(context) {
     return visitModuleSources(
       context,
       (source) =>

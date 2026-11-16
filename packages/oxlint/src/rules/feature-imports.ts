@@ -1,6 +1,7 @@
 import path from 'node:path'
 import type { TSESLint } from '@typescript-eslint/utils'
 import { visitModuleSources } from '../module-sources.js'
+import type { CreateOnceRule } from '../create-once-rule.js'
 
 /** Feature names from each `features/<feature>` pair in a path, outermost first. */
 function featureNames(modulePath: string): string[] {
@@ -22,7 +23,9 @@ function isRelative(source: string): boolean {
   )
 }
 
-const featureImports: TSESLint.RuleModule<'forbiddenImport', []> = {
+const featureImports: CreateOnceRule<
+  TSESLint.RuleModule<'forbiddenImport', []>
+> = {
   meta: {
     type: 'problem',
     docs: {
@@ -34,20 +37,26 @@ const featureImports: TSESLint.RuleModule<'forbiddenImport', []> = {
         'Features must not import "{{source}}" from another feature under features/. Move code that multiple features share to the matching src-level layer, such as middleware/, handlers/, services/, or utils/, and make it generic enough for each consumer.',
     },
   },
-  create(context) {
-    const directory = path.posix.dirname(context.filename.replace(/\\/g, '/'))
-    const features = featureNames(directory)
-    if (features.length === 0) return {}
+  createOnce(context) {
+    let directory: string
+    let features: string[]
 
-    return visitModuleSources(context, (source) => {
-      const target = isRelative(source)
-        ? path.posix.join(directory, source)
-        : source
-      // Nested sub-features may reach their ancestors and descendants, not siblings.
-      return featureNames(target).some(
-        (name, index) => index < features.length && name !== features[index],
-      )
-    })
+    return {
+      before() {
+        directory = path.posix.dirname(context.filename.replace(/\\/g, '/'))
+        features = featureNames(directory)
+        return features.length > 0
+      },
+      ...visitModuleSources(context, (source) => {
+        const target = isRelative(source)
+          ? path.posix.join(directory, source)
+          : source
+        // Nested sub-features may reach their ancestors and descendants, not siblings.
+        return featureNames(target).some(
+          (name, index) => index < features.length && name !== features[index],
+        )
+      }),
+    }
   },
 }
 

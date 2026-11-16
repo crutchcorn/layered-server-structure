@@ -1,7 +1,10 @@
 import type { TSESLint } from '@typescript-eslint/utils'
 import { isLayer, isModuleKind, visitModuleSources } from '../module-sources.js'
+import type { CreateOnceRule } from '../create-once-rule.js'
 
-const middlewareImports: TSESLint.RuleModule<'forbiddenImport', []> = {
+const middlewareImports: CreateOnceRule<
+  TSESLint.RuleModule<'forbiddenImport', []>
+> = {
   meta: {
     type: 'problem',
     docs: {
@@ -14,7 +17,7 @@ const middlewareImports: TSESLint.RuleModule<'forbiddenImport', []> = {
         'Middleware must not import "{{source}}". Keep request-lifecycle middleware independent of routes and .logic modules; wire middleware onto endpoints inside a .route file.',
     },
   },
-  create(context) {
+  createOnce(context) {
     return visitModuleSources(
       context,
       (source) =>

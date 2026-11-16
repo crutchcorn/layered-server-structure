@@ -6,6 +6,7 @@ This repository contains tools for adopting and enforcing LSS. Use them together
 | ---------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [Agent skill](skills/layered-server-structure/SKILL.md)          | Guide your coding agent when building, refactoring, or reviewing backend features and API routes.                                                                       |
 | [ESLint plugin](https://www.npmjs.com/package/lss-eslint-plugin) | Check import boundaries, keep features independent, enforce `.route` and `.logic` naming and per-verb limits, and optionally validate the full `src/` folder structure. |
+| [Oxlint plugin](packages/oxlint/README.md)                       | Check the same architecture rules in Oxlint.                                                                                                                            |
 
 ## Install the skill
 
