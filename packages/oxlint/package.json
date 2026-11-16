@@ -1,6 +1,6 @@
 {
   "name": "lss-oxlint-plugin",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "description": "Oxlint rules for Layered Server Structure (LSS).",
   "keywords": [
