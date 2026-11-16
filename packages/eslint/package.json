@@ -1,6 +1,6 @@
 {
   "name": "lss-eslint-plugin",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "description": "ESLint rules and folder structure preset for Layered Server Structure (LSS).",
   "keywords": [
