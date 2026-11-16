@@ -1,5 +1,11 @@
 # lss-eslint-plugin
 
+## 0.1.1
+
+### Patch Changes
+
+- 30a7ffc: Share the Layered Server Structure rules with the Oxlint plugin through `eslintCompatPlugin` so rule updates apply to both linters.
+
 ## 0.1.0
 
 ### Minor Changes
