@@ -6,10 +6,11 @@ import {
   parseRoleFilename,
   ROUTE_VERBS,
 } from '../route-conventions.js'
+import type { CreateOnceRule } from '../create-once-rule.js'
 
 const allowedVerbsList = ROUTE_VERBS.join(', ')
 
-const oneLogicPerFolder: Rule.RuleModule = {
+const oneLogicPerFolder: CreateOnceRule<Rule.RuleModule> = {
   meta: {
     type: 'problem',
     docs: {
@@ -34,17 +35,20 @@ const oneLogicPerFolder: Rule.RuleModule = {
         'Only one .{{verb}}.logic file is allowed per folder. Found: {{files}}. Move reusable calculations into utils/ or I/O into services/.',
     },
   },
-  create(context) {
-    if (!context.physicalFilename || context.physicalFilename === '<input>') {
-      return {}
-    }
-    const filename = path.resolve(context.cwd, context.physicalFilename)
-    const basename = path.basename(filename)
-    const parsed = parseRoleFilename(basename, 'logic')
-    if (!parsed) return {}
-
+  createOnce(context) {
     return {
       Program(node) {
+        if (
+          !context.physicalFilename ||
+          context.physicalFilename === '<input>'
+        ) {
+          return
+        }
+        const filename = path.resolve(context.cwd, context.physicalFilename)
+        const basename = path.basename(filename)
+        const parsed = parseRoleFilename(basename, 'logic')
+        if (!parsed) return
+
         if (parsed.kind === 'invalid-verb') {
           context.report({
             node,

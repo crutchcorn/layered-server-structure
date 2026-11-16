@@ -5,8 +5,11 @@ import {
   isRoutingFramework,
   visitModuleSources,
 } from '../module-sources.js'
+import type { CreateOnceRule } from '../create-once-rule.js'
 
-const serviceImports: TSESLint.RuleModule<'forbiddenImport', []> = {
+const serviceImports: CreateOnceRule<
+  TSESLint.RuleModule<'forbiddenImport', []>
+> = {
   meta: {
     type: 'problem',
     docs: {
@@ -19,7 +22,7 @@ const serviceImports: TSESLint.RuleModule<'forbiddenImport', []> = {
         'Services must not import "{{source}}". Services own I/O and resource lifetimes; keep routing frameworks, middleware, handlers, routes, and logic modules outside the service layer.',
     },
   },
-  create(context) {
+  createOnce(context) {
     return visitModuleSources(
       context,
       (source) =>
